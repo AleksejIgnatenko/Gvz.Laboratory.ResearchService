@@ -8,7 +8,7 @@ namespace Gvz.Laboratory.ResearchService.Validations
         public ResearchValidation()
         {
             RuleFor(x => x.ResearchName)
-                    .NotEmpty().WithMessage("Название поставщика не может быть пустым");
+                .NotEmpty().WithMessage("Название исследования не может быть пустым");
         }
     }
 }

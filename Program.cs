@@ -2,6 +2,7 @@ using Confluent.Kafka;
 using Gvz.Laboratory.ResearchService;
 using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Kafka;
+using Gvz.Laboratory.ResearchService.Middleware;
 using Gvz.Laboratory.ResearchService.Repositories;
 using Gvz.Laboratory.ResearchService.Services;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ builder.Services.AddDbContext<GvzLaboratoryResearchServiceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddScoped<IResearchService, ResearchService>();
@@ -67,10 +69,19 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors(x =>
+{
+    x.WithHeaders().AllowAnyHeader();
+    x.WithOrigins("http://localhost:3000");
+    x.WithMethods().AllowAnyMethod();
+});
 
 app.Run();

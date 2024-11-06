@@ -1,6 +1,8 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Dto;
 using Gvz.Laboratory.ResearchService.Entities;
+using Gvz.Laboratory.ResearchService.Exceptions;
+using Gvz.Laboratory.ResearchService.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gvz.Laboratory.ResearchService.Repositories
@@ -31,6 +33,22 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             }
 
             return product.Id;
+        }
+
+        public async Task<ProductModel> GetProductForResearchIdAsync(Guid researchId)
+        {
+            var researchEntity = await _context.Researches
+                .Include(r => r.Product)
+                .FirstOrDefaultAsync(r => r.Id == researchId);
+
+            if(researchEntity == null)
+            {
+                throw new RepositoryException("Продукт не найден");
+            }
+
+            var product = ProductModel.Create(researchEntity.Product.Id, researchEntity.Product.ProductName);
+
+            return product;
         }
 
         public async Task<ProductEntity?> GetProductByIdAsync(Guid productId)
