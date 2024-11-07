@@ -40,10 +40,46 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             return researchEntity.Id;
         }
 
+        public async Task<(List<ResearchModel> researches, int numberResearches)> GetResearchesByProductIdForPageAsync(Guid productId, int pageNumber)
+        {
+            var researchEntity = await _context.Products
+                .Where(p => p.Id == productId)
+                .Include(p => p.Researches)
+                    .ThenInclude(r => r.Product)
+                .SelectMany(p => p.Researches)
+                .Skip(pageNumber * 20)
+                .Take(20)
+                .ToListAsync();
+
+            if (!researchEntity.Any() && pageNumber != 0)
+            {
+                pageNumber--;
+                researchEntity = await _context.Products
+                    .Where(p => p.Id == productId)
+                    .Include(p => p.Researches)
+                        .ThenInclude(r => r.Product)
+                    .SelectMany(p => p.Researches)
+                    .Skip(pageNumber * 20)
+                    .Take(20)
+                    .ToListAsync();
+            }
+
+            var numberResearches = await _context.Researches.CountAsync();
+
+            var researches = researchEntity.Select(r => ResearchModel.Create(
+                r.Id,
+                r.ResearchName,
+                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                false).research).ToList();
+
+            return (researches, numberResearches);
+        }
+
         public async Task<(List<ResearchModel> researches, int numberResearches)> GetResearchesForPageAsync(int pageNumber)
         {
             var researchEntities = await _context.Researches
                 .AsNoTracking()
+                .Include(r => r.Product)
                 .OrderByDescending(r => r.DateCreate)
                 .Skip(pageNumber * 20)
                 .Take(20)
@@ -54,6 +90,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                 pageNumber--;
                 researchEntities = await _context.Researches
                     .AsNoTracking()
+                    .Include(r => r.Product)
                     .OrderByDescending(r => r.DateCreate)
                     .Skip(pageNumber * 20)
                     .Take(20)
@@ -65,6 +102,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researches = researchEntities.Select(r => ResearchModel.Create(
                 r.Id,
                 r.ResearchName,
+                ProductModel.Create(r.Product.Id, r.Product.ProductName),
                 false).research).ToList();
 
             return (researches, numberResearches);

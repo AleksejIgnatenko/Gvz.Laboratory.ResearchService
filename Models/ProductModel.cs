@@ -6,6 +6,10 @@
         public string ProductName { get; } = string.Empty;
         //public List<ResearchModel> Researches { get; set; } = new List<ResearchModel>();
 
+        public ProductModel()
+        {
+        }
+
         public ProductModel(Guid id, string productName)
         {
             Id = id;

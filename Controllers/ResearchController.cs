@@ -1,5 +1,6 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Contracts;
+using Gvz.Laboratory.ResearchService.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gvz.Laboratory.ResearchService.Controllers
@@ -25,11 +26,24 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> DeleteResearchAsync(int pageNumber)
+        [Route("getResearchesByProductIdForPage")]
+        public async Task<ActionResult> GetResearchesByProductIdForPageAsync(Guid productId, int pageNumber)
+        {
+            var (researches, numberResearches) = await _researchService.GetResearchesByProductIdForPageAsync(productId, pageNumber);
+
+            var response = researches.Select(r => new GetResearchesResponse(r.Id, r.ResearchName, r.Product.ProductName)).ToList();
+
+            var responseWrapper = new GetResearchesForPageResponseWrapper(response, numberResearches);
+
+            return Ok(responseWrapper);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> GetResearchesForPageAsync(int pageNumber)
         {
             var (researches, numberResearches) = await _researchService.GetResearchesForPageAsync(pageNumber);
 
-            var response = researches.Select(r => new GetResearchesForPageResponse(r.Id, r.ResearchName)).ToList();
+            var response = researches.Select(r => new GetResearchesResponse(r.Id, r.ResearchName, r.Product.ProductName)).ToList();
 
             var responseWrapper = new GetResearchesForPageResponseWrapper(response, numberResearches);
 

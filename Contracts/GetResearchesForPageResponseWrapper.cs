@@ -1,7 +1,7 @@
 ﻿namespace Gvz.Laboratory.ResearchService.Contracts
 {
     public record GetResearchesForPageResponseWrapper(
-        List<GetResearchesForPageResponse> Researches,
+        List<GetResearchesResponse> Researches,
         int NumberResearches
         );
 }

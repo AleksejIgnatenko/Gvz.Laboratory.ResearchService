@@ -37,6 +37,11 @@ namespace Gvz.Laboratory.ResearchService.Services
             return researchId;
         }
 
+        public async Task<(List<ResearchModel> researches, int numberResearches)> GetResearchesByProductIdForPageAsync(Guid productId, int pageNumber)
+        {
+            return await _researchRepository.GetResearchesByProductIdForPageAsync(productId, pageNumber);
+        }
+
         public async Task<(List<ResearchModel> researches, int numberResearches)> GetResearchesForPageAsync(int pageNumber)
         {
             return await _researchRepository.GetResearchesForPageAsync(pageNumber);
