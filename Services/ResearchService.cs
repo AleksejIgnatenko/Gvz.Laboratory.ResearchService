@@ -8,9 +8,9 @@ namespace Gvz.Laboratory.ResearchService.Services
     public class ResearchService : IResearchService
     {
         private readonly IResearchRepository _researchRepository;
-        private readonly IResearchKafkaProducer _researchKafkaProducer;
+        private readonly IKafkaProducer _researchKafkaProducer;
 
-        public ResearchService(IResearchRepository researchRepository, IResearchKafkaProducer researchKafkaProducer)
+        public ResearchService(IResearchRepository researchRepository, IKafkaProducer researchKafkaProducer)
         {
             _researchRepository = researchRepository;
             _researchKafkaProducer = researchKafkaProducer;

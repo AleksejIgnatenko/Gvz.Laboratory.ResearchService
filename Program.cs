@@ -33,17 +33,22 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IResearchService, ResearchService>();
 builder.Services.AddScoped<IResearchRepository, ResearchRepository>();
 
+builder.Services.AddScoped<IPartyRepository, PartyRepository>();
+
+builder.Services.AddScoped<IResearchResultsService, ResearchResultsService>();
+builder.Services.AddScoped<IResearchResultsRepository, ResearchResultsRepository>();
+
 var producerConfig = new ProducerConfig
 {
     BootstrapServers = "kafka:29092"
 };
 builder.Services.AddSingleton<IProducer<Null, string>>(new ProducerBuilder<Null, string>(producerConfig).Build());
-builder.Services.AddScoped<IResearchKafkaProducer, ResearchKafkaProducer>();
+builder.Services.AddScoped<IKafkaProducer, KafkaProducer>();
 
 var consumerConfig = new ConsumerConfig
 {
     BootstrapServers = "kafka:29092",
-    GroupId = "product-group-id",
+    GroupId = "research-group-id",
     AutoOffsetReset = AutoOffsetReset.Earliest
 };
 builder.Services.AddSingleton(consumerConfig);

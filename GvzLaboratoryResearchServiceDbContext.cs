@@ -6,6 +6,7 @@ namespace Gvz.Laboratory.ResearchService
     public class GvzLaboratoryResearchServiceDbContext : DbContext
     {
         public DbSet<ProductEntity> Products { get; set; }
+        public DbSet<PartyEntity> Parties { get; set; }
         public DbSet<ResearchEntity> Researches { get; set; }
         public DbSet<ResearchResultEntity> ResearchResults { get; set; }
 

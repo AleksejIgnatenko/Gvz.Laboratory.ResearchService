@@ -1,6 +1,5 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Contracts;
-using Gvz.Laboratory.ResearchService.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gvz.Laboratory.ResearchService.Controllers
@@ -58,7 +57,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteProduDeleteResearchAsyncctAsync([FromBody] List<Guid> ids)
+        public async Task<ActionResult> DeleteResearchAsync([FromBody] List<Guid> ids)
         {
             if (ids == null || !ids.Any())
             {

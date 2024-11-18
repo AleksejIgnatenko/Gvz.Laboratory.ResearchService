@@ -9,8 +9,12 @@ namespace Gvz.Laboratory.ResearchService.Models
     {
         public Guid Id { get; }
         public string ResearchName { get; } = string.Empty;
-        public ProductModel Product { get; set; } = new ProductModel();
-        //public List<ResearchResultModel> ResearchResults { get; set; } = new List<ResearchResultModel>();
+        public ProductModel Product { get; } = new ProductModel();
+        public List<ResearchResultModel> ResearchResults { get; set; } = new List<ResearchResultModel>();
+
+        public ResearchModel()
+        {
+        }
 
         private ResearchModel(Guid id, string researchName)
         {

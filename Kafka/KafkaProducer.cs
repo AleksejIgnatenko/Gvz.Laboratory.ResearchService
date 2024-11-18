@@ -5,11 +5,11 @@ using System.Text.Json;
 
 namespace Gvz.Laboratory.ResearchService.Kafka
 {
-    public class ResearchKafkaProducer : IResearchKafkaProducer
+    public class KafkaProducer : IKafkaProducer
     {
         private readonly IProducer<Null, string> _producer;
 
-        public ResearchKafkaProducer(IProducer<Null, string> producer)
+        public KafkaProducer(IProducer<Null, string> producer)
         {
             _producer = producer;
         }
@@ -18,6 +18,12 @@ namespace Gvz.Laboratory.ResearchService.Kafka
         {
             var serializedResearch = JsonSerializer.Serialize(research);
             await _producer.ProduceAsync(topic, new Message<Null, string> { Value = serializedResearch });
+        }
+
+        public async Task SendToKafkaAsync(ResearchResultsDto researchResults, string topic)
+        {
+            var serializedResearchResults = JsonSerializer.Serialize(researchResults);
+            await _producer.ProduceAsync(topic, new Message<Null, string> { Value = serializedResearchResults });
         }
 
         public async Task SendToKafkaAsync(List<Guid> ids, string topic)

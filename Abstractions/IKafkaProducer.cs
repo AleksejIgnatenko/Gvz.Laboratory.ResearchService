@@ -2,9 +2,10 @@
 
 namespace Gvz.Laboratory.ResearchService.Abstractions
 {
-    public interface IResearchKafkaProducer
+    public interface IKafkaProducer
     {
         Task SendToKafkaAsync(List<Guid> ids, string topic);
         Task SendToKafkaAsync(ResearchDto research, string topic);
+        Task SendToKafkaAsync(ResearchResultsDto researchResults, string topic);
     }
 }

@@ -42,31 +42,29 @@ namespace Gvz.Laboratory.ResearchService.Repositories
 
         public async Task<(List<ResearchModel> researches, int numberResearches)> GetResearchesByProductIdForPageAsync(Guid productId, int pageNumber)
         {
-            var researchEntity = await _context.Products
-                .Where(p => p.Id == productId)
-                .Include(p => p.Researches)
-                    .ThenInclude(r => r.Product)
-                .SelectMany(p => p.Researches)
-                .Skip(pageNumber * 20)
-                .Take(20)
-                .ToListAsync();
+            var researchEntities = await _context.Researches
+                    .Where(r => r.Product.Id == productId)
+                    .Include(r => r.Product)
+                    .Skip(pageNumber * 20)
+                    .Take(20)
+                    .ToListAsync();
 
-            if (!researchEntity.Any() && pageNumber != 0)
+            if (!researchEntities.Any() && pageNumber != 0)
             {
                 pageNumber--;
-                researchEntity = await _context.Products
-                    .Where(p => p.Id == productId)
-                    .Include(p => p.Researches)
-                        .ThenInclude(r => r.Product)
-                    .SelectMany(p => p.Researches)
+                researchEntities = await _context.Researches
+                    .Where(r => r.Product.Id == productId)
+                    .Include(r => r.Product)
                     .Skip(pageNumber * 20)
                     .Take(20)
                     .ToListAsync();
             }
 
-            var numberResearches = await _context.Researches.CountAsync();
+            var numberResearches = await _context.Researches
+                .Where(r => r.Product.Id == productId)
+                .CountAsync();
 
-            var researches = researchEntity.Select(r => ResearchModel.Create(
+            var researches = researchEntities.Select(r => ResearchModel.Create(
                 r.Id,
                 r.ResearchName,
                 ProductModel.Create(r.Product.Id, r.Product.ProductName),
@@ -106,6 +104,12 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                 false).research).ToList();
 
             return (researches, numberResearches);
+        }
+
+
+        public async Task<ResearchEntity?> GetResearchEntityByIdAsync(Guid id)
+        {
+            return await _context.Researches.FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<Guid> UpdateResearchAsync(ResearchModel research, Guid productId)
