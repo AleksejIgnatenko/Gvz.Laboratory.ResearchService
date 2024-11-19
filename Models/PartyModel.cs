@@ -28,7 +28,7 @@
 
         public PartyModel(Guid id, int batchNumber, string dateOfReceipt, string productName, string supplierName,
             string manufacturerName, double batchSize, double sampleSize, int ttn, string documentOnQualityAndSafety,
-            string testReport, string dateOfManufacture, string expirationDate, string packaging, string marking, string result, string surname,
+            string testReport, string dateOfManufacture, string expirationDate, string packaging, string marking, string surname,
             string note)
         {
             Id = id;
@@ -46,19 +46,18 @@
             ExpirationDate = expirationDate;
             Packaging = packaging;
             Marking = marking;
-            Result = result;
             Surname = surname;
             Note = note;
         }
 
         public static PartyModel Create(Guid id, int batchNumber, string dateOfReceipt, string productName, string supplierName,
             string manufacturerName, double batchSize, double sampleSize, int ttn, string documentOnQualityAndSafety,
-            string testReport, string dateOfManufacture, string expirationDate, string packaging, string marking, string result, string surname,
+            string testReport, string dateOfManufacture, string expirationDate, string packaging, string marking, string surname,
             string note)
         {
             return new PartyModel(id, batchNumber, dateOfReceipt, productName, supplierName,
             manufacturerName, batchSize, sampleSize, ttn, documentOnQualityAndSafety,
-            testReport, dateOfManufacture, expirationDate, packaging, marking, result, surname,
+            testReport, dateOfManufacture, expirationDate, packaging, marking, surname,
             note);
         }
     }

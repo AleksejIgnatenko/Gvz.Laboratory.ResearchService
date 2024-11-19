@@ -1,4 +1,5 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
+using Gvz.Laboratory.ResearchService.Dto;
 using Gvz.Laboratory.ResearchService.Entities;
 using Gvz.Laboratory.ResearchService.Exceptions;
 using Gvz.Laboratory.ResearchService.Models;
@@ -19,30 +20,32 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             _partyRepository = partyRepository;
         }
 
-        public async Task<Guid> CreateResearchResultsAsync(ResearchResultModel researchResult, Guid researchId, Guid partyId)
+        public async Task CreateResearchResultsAsync(Guid partyId, Guid productId)
         {
-            //var existingResearchResult = await _context.ResearchResults.FirstOrDefaultAsync(p => p.Research.Id == researchId);
-            //if (existingResearchResult != null) { throw new RepositoryException("У партии уже есть результатна это исследование."); }
+            var partyEntity = await _partyRepository.GetPartyEntityByIdAsync(partyId);
 
-            var existingResearch = await _researchRepository.GetResearchEntityByIdAsync(researchId)
-                ?? throw new RepositoryException("Исследование не найдено.");
+            var productResearchEntities = await _researchRepository.GetResearchEntitiesByProductIdAsync(productId);
 
-            var existingParty = await _partyRepository.GetPartyEntityByIdAsync(researchId)
-                ?? throw new RepositoryException("Исследование не найдено.");
-
-            var researchResultEntity = new ResearchResultEntity
+            if ((productResearchEntities != null) && (partyEntity != null))
             {
-                Id = researchResult.Id,
-                Research = existingResearch,
-                Party = existingParty,
-                Result = researchResult.Result,
-                DateCreate = DateTime.UtcNow,
-            };
+                var researchResults = new List<ResearchResultEntity>();
 
-            await _context.ResearchResults.AddAsync(researchResultEntity);
-            await _context.SaveChangesAsync();
+                foreach (var research in productResearchEntities)
+                {
+                    var researchResultEntity = new ResearchResultEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        Research = research,
+                        Party = partyEntity,
+                        Result = string.Empty,
+                        DateCreate = DateTime.Now,
+                    };
 
-            return researchResultEntity.Id;
+                    researchResults.Add(researchResultEntity);
+                }
+                await _context.ResearchResults.AddRangeAsync(researchResults);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByResearchIdForPageAsync(Guid researchId, int pageNumber)
@@ -88,7 +91,6 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                         r.Party.ExpirationDate,
                         r.Party.Packaging,
                         r.Party.Marking,
-                        r.Party.Result,
                         r.Party.Surname,
                         r.Party.Note),
                     r.Result,

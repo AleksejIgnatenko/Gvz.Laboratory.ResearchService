@@ -85,7 +85,6 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                 p.ExpirationDate,
                 p.Packaging,
                 p.Marking,
-                p.Result,
                 p.Surname,
                 p.Note
                 )).ToList();

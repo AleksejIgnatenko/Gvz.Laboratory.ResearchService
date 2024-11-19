@@ -33,6 +33,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IResearchService, ResearchService>();
 builder.Services.AddScoped<IResearchRepository, ResearchRepository>();
 
+builder.Services.AddScoped<IPartyService, PartyService>();
 builder.Services.AddScoped<IPartyRepository, PartyRepository>();
 
 builder.Services.AddScoped<IResearchResultsService, ResearchResultsService>();
@@ -61,6 +62,15 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<Update
 
 builder.Services.AddSingleton<DeleteProductKafkaConsumer>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<DeleteProductKafkaConsumer>());
+
+builder.Services.AddSingleton<AddPartyKafkaConsumer>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<AddPartyKafkaConsumer>());
+
+builder.Services.AddSingleton<UpdatePartyKafkaConsumer>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<UpdatePartyKafkaConsumer>());
+
+builder.Services.AddSingleton<DeletePartyKafkaConsumer>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<DeletePartyKafkaConsumer>());
 
 var app = builder.Build();
 

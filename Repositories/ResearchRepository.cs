@@ -107,9 +107,27 @@ namespace Gvz.Laboratory.ResearchService.Repositories
         }
 
 
-        public async Task<ResearchEntity?> GetResearchEntityByIdAsync(Guid id)
+        public async Task<List<ResearchEntity>?> GetResearchEntitiesByProductIdAsync(Guid productId)
         {
-            return await _context.Researches.FirstOrDefaultAsync(r => r.Id == id);
+            return await _context.Researches
+                .Where(r => r.Product.Id == productId)
+                .ToListAsync();
+            ;
+        }
+
+        public async Task<List<ResearchModel>?> GetResearchesByProductIdAsync(Guid productId)
+        {
+            var researchEntities = await _context.Researches
+                .Where(r => r.Product.Id == productId)
+                .ToListAsync();
+
+            var researches = researchEntities.Select(r => ResearchModel.Create(
+                r.Id,
+                r.ResearchName,
+                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                false).research).ToList();
+
+            return researches;
         }
 
         public async Task<Guid> UpdateResearchAsync(ResearchModel research, Guid productId)
