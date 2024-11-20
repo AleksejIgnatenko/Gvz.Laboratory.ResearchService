@@ -26,9 +26,23 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         //}
 
         [HttpGet]
+        [Route("researchResultsByResearchIdForPage")]
         public async Task<ActionResult> GetResearchResultsByResearchIdForPageAsync(Guid researchId, int pageNumber)
         {
             var (researchResults, numberResearchResults) = await _researchResultsService.GetResearchResultsByResearchIdForPageAsync(researchId, pageNumber);
+
+            var response = researchResults.Select(r => new GetResearchResultsResponse(r.Id, r.Research.ResearchName, r.Party.BatchNumber, r.Result)).ToList();
+
+            var responseWrapper = new GetResearchResultsResponseWrapper(response, numberResearchResults);
+
+            return Ok(responseWrapper);
+        }
+
+        [HttpGet]
+        [Route("researchResultsByPartyIdForPage")]
+        public async Task<ActionResult> GetResearchResultsByPartyIdForPageAsync(Guid partyId, int pageNumber)
+        {
+            var (researchResults, numberResearchResults) = await _researchResultsService.GetResearchResultsByPartyIdForPageAsync(partyId, pageNumber);
 
             var response = researchResults.Select(r => new GetResearchResultsResponse(r.Id, r.Research.ResearchName, r.Party.BatchNumber, r.Result)).ToList();
 

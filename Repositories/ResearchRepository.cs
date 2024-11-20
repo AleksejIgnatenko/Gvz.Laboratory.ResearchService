@@ -132,18 +132,29 @@ namespace Gvz.Laboratory.ResearchService.Repositories
 
         public async Task<Guid> UpdateResearchAsync(ResearchModel research, Guid productId)
         {
-            var existingProduct = await _productRepository.GetProductByIdAsync(productId)
-               ?? throw new RepositoryException("Продукт не найден");
-
             var researchEntity = await _context.Researches
                 .Include(r => r.Product)
                 .FirstOrDefaultAsync(r => r.Id == research.Id)
                 ?? throw new RepositoryException("Исследование не найдено");
 
-            researchEntity.ResearchName = research.ResearchName;
-            researchEntity.Product = existingProduct;
+            var existingResearchName = await _context.Researches
+                .Where(r => (r.Product.Id == productId) && (r.ResearchName == research.ResearchName) && (r.ResearchName != researchEntity.ResearchName))
+                .FirstOrDefaultAsync();
 
-            await _context.SaveChangesAsync();
+            if (existingResearchName == null)
+            {
+                var existingProduct = await _productRepository.GetProductByIdAsync(productId)
+                   ?? throw new RepositoryException("Продукт не найден");
+
+                researchEntity.ResearchName = research.ResearchName;
+                researchEntity.Product = existingProduct;
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new RepositoryException("У выбранного продукта уже есть исследование с таким названием.");
+            }
 
             return productId;
         }

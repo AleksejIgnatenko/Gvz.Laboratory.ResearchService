@@ -53,6 +53,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researchResultEntities = await _context.ResearchResults
                     .Where(r => r.Research.Id == researchId)
                     .Include(r => r.Research)
+                    .Include(r => r.Party)
                     .Skip(pageNumber * 20)
                     .Take(20)
                     .ToListAsync();
@@ -63,6 +64,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                 researchResultEntities = await _context.ResearchResults
                     .Where(r => r.Research.Id == researchId)
                     .Include(r => r.Research)
+                    .Include(r => r.Party)
                     .Skip(pageNumber * 20)
                     .Take(20)
                     .ToListAsync();
@@ -70,6 +72,59 @@ namespace Gvz.Laboratory.ResearchService.Repositories
 
             var numberResearchResults = await _context.ResearchResults
                     .Where(r => r.Research.Id == researchId)
+                    .CountAsync();
+
+            var researchResults = researchResultEntities.Select(r => ResearchResultModel.Create(
+                    r.Id,
+                    ResearchModel.Create(r.Research.Id, r.Research.ResearchName, false).research,
+                    PartyModel.Create(
+                        r.Party.Id,
+                        r.Party.BatchNumber,
+                        r.Party.DateOfReceipt,
+                        r.Party.ProductName,
+                        r.Party.SupplierName,
+                        r.Party.ManufacturerName,
+                        r.Party.BatchSize,
+                        r.Party.SampleSize,
+                        r.Party.TTN,
+                        r.Party.DocumentOnQualityAndSafety,
+                        r.Party.TestReport,
+                        r.Party.DateOfManufacture,
+                        r.Party.ExpirationDate,
+                        r.Party.Packaging,
+                        r.Party.Marking,
+                        r.Party.Surname,
+                        r.Party.Note),
+                    r.Result,
+                    false).researchResult).ToList();
+
+            return (researchResults, numberResearchResults);
+        }
+
+        public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByPartyIdForPageAsync(Guid partyId, int pageNumber)
+        {
+            var researchResultEntities = await _context.ResearchResults
+                    .Where(r => r.Party.Id == partyId)
+                    .Include(r => r.Research)
+                    .Include(r => r.Party)
+                    .Skip(pageNumber * 20)
+                    .Take(20)
+                    .ToListAsync();
+
+            if (!researchResultEntities.Any() && pageNumber != 0)
+            {
+                pageNumber--;
+                researchResultEntities = await _context.ResearchResults
+                    .Where(r => r.Party.Id == partyId)
+                    .Include(r => r.Research)
+                    .Include(r => r.Party)
+                    .Skip(pageNumber * 20)
+                    .Take(20)
+                    .ToListAsync();
+            }
+
+            var numberResearchResults = await _context.ResearchResults
+                    .Where(r => r.Party.Id == partyId)
                     .CountAsync();
 
             var researchResults = researchResultEntities.Select(r => ResearchResultModel.Create(

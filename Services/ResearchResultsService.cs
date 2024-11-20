@@ -15,14 +15,14 @@ namespace Gvz.Laboratory.ResearchService.Services
             _kafkaProducer = kafkaProducer;
         }
 
-        //public async Task<Guid> (Guid id, Guid researchId, Guid partyId, string result)
-        //{
-
-        //}
-
         public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByResearchIdForPageAsync(Guid researchId, int pageNumber)
         {
             return await _researchResultsRepository.GetResearchResultsByResearchIdForPageAsync(researchId, pageNumber);
+        }
+
+        public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByPartyIdForPageAsync(Guid partyId, int pageNumber)
+        {
+            return await _researchResultsRepository.GetResearchResultsByPartyIdForPageAsync(partyId, pageNumber);
         }
 
         public async Task<Guid> UpdateResearchResultAsync(Guid id, string result)

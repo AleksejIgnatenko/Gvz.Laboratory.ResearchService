@@ -1,6 +1,5 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Dto;
-using Gvz.Laboratory.ResearchService.Models;
 
 namespace Gvz.Laboratory.ResearchService.Services
 {
