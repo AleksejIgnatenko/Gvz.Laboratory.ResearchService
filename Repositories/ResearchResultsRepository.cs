@@ -1,5 +1,4 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
-using Gvz.Laboratory.ResearchService.Dto;
 using Gvz.Laboratory.ResearchService.Entities;
 using Gvz.Laboratory.ResearchService.Exceptions;
 using Gvz.Laboratory.ResearchService.Models;
@@ -48,9 +47,45 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             }
         }
 
+        public async Task<List<ResearchResultModel>> GetResearchResultsAsync()
+        {
+            var researchResultEntities = await _context.ResearchResults
+                    .AsNoTracking()
+                    .Include(r => r.Research)
+                    .Include(r => r.Party)
+                    .ToListAsync();
+
+            var researchResults = researchResultEntities.Select(r => ResearchResultModel.Create(
+                    r.Id,
+                    ResearchModel.Create(r.Research.Id, r.Research.ResearchName, false).research,
+                    PartyModel.Create(
+                        r.Party.Id,
+                        r.Party.BatchNumber,
+                        r.Party.DateOfReceipt,
+                        r.Party.ProductName,
+                        r.Party.SupplierName,
+                        r.Party.ManufacturerName,
+                        r.Party.BatchSize,
+                        r.Party.SampleSize,
+                        r.Party.TTN,
+                        r.Party.DocumentOnQualityAndSafety,
+                        r.Party.TestReport,
+                        r.Party.DateOfManufacture,
+                        r.Party.ExpirationDate,
+                        r.Party.Packaging,
+                        r.Party.Marking,
+                        r.Party.Surname,
+                        r.Party.Note),
+                    r.Result,
+                    false).researchResult).ToList();
+
+            return researchResults;
+        }
+
         public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByResearchIdForPageAsync(Guid researchId, int pageNumber)
         {
             var researchResultEntities = await _context.ResearchResults
+                    .AsNoTracking()
                     .Where(r => r.Research.Id == researchId)
                     .Include(r => r.Research)
                     .Include(r => r.Party)
@@ -104,6 +139,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
         public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByPartyIdForPageAsync(Guid partyId, int pageNumber)
         {
             var researchResultEntities = await _context.ResearchResults
+                    .AsNoTracking()
                     .Where(r => r.Party.Id == partyId)
                     .Include(r => r.Research)
                     .Include(r => r.Party)
@@ -126,6 +162,56 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var numberResearchResults = await _context.ResearchResults
                     .Where(r => r.Party.Id == partyId)
                     .CountAsync();
+
+            var researchResults = researchResultEntities.Select(r => ResearchResultModel.Create(
+                    r.Id,
+                    ResearchModel.Create(r.Research.Id, r.Research.ResearchName, false).research,
+                    PartyModel.Create(
+                        r.Party.Id,
+                        r.Party.BatchNumber,
+                        r.Party.DateOfReceipt,
+                        r.Party.ProductName,
+                        r.Party.SupplierName,
+                        r.Party.ManufacturerName,
+                        r.Party.BatchSize,
+                        r.Party.SampleSize,
+                        r.Party.TTN,
+                        r.Party.DocumentOnQualityAndSafety,
+                        r.Party.TestReport,
+                        r.Party.DateOfManufacture,
+                        r.Party.ExpirationDate,
+                        r.Party.Packaging,
+                        r.Party.Marking,
+                        r.Party.Surname,
+                        r.Party.Note),
+                    r.Result,
+                    false).researchResult).ToList();
+
+            return (researchResults, numberResearchResults);
+        }
+
+        public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> SearchResearchResultsAsync(string searchQuery, int pageNumber)
+        {
+            var researchResultEntities = await _context.ResearchResults
+                    .AsNoTracking()
+                    .Include(r => r.Research)
+                    .Include(r => r.Party)
+                    .Where(r => 
+                        r.Research.ResearchName.ToLower().Contains(searchQuery.ToLower()) || 
+                        r.Party.BatchNumber.ToString().ToLower().Contains(searchQuery.ToLower()) || 
+                        r.Result.ToLower().Contains(searchQuery.ToLower())
+                    )
+                    .OrderByDescending(r => r.DateCreate)
+                    .Skip(pageNumber * 20)
+                    .Take(20)
+                    .ToListAsync();
+
+            var numberResearchResults = await _context.ResearchResults
+                    .AsNoTracking()
+                    .CountAsync(r =>
+                        r.Research.ResearchName.ToLower().Contains(searchQuery.ToLower()) ||
+                        r.Party.BatchNumber.ToString().ToLower().Contains(searchQuery.ToLower()) ||
+                        r.Result.ToLower().Contains(searchQuery.ToLower()));
 
             var researchResults = researchResultEntities.Select(r => ResearchResultModel.Create(
                     r.Id,

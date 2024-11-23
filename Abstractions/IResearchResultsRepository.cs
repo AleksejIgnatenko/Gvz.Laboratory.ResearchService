@@ -8,6 +8,8 @@ namespace Gvz.Laboratory.ResearchService.Abstractions
         Task DeleteResearchResultsAsync(List<Guid> ids);
         Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByResearchIdForPageAsync(Guid researchId, int pageNumber);
         Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByPartyIdForPageAsync(Guid partyId, int pageNumber);
+        Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> SearchResearchResultsAsync(string searchQuery, int pageNumber);
+        Task<List<ResearchResultModel>> GetResearchResultsAsync();
         Task<Guid> UpdateResearchResultAsync(ResearchResultModel researchResult);
     }
 }

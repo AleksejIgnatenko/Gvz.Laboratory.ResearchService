@@ -1,5 +1,6 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gvz.Laboratory.ResearchService.Controllers
@@ -41,6 +42,31 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         public async Task<ActionResult> GetResearchesForPageAsync(int pageNumber)
         {
             var (researches, numberResearches) = await _researchService.GetResearchesForPageAsync(pageNumber);
+
+            var response = researches.Select(r => new GetResearchesResponse(r.Id, r.ResearchName, r.Product.ProductName)).ToList();
+
+            var responseWrapper = new GetResearchesForPageResponseWrapper(response, numberResearches);
+
+            return Ok(responseWrapper);
+        }
+
+        [HttpGet]
+        [Route("exportResearchesToExcel")]
+        [Authorize]
+        public async Task<ActionResult> ExportResearchesToExcelAsync()
+        {
+            var stream = await _researchService.ExportResearchesToExcelAsync();
+            var fileName = "Researches.xlsx";
+
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        [HttpGet]
+        [Route("searchResearches")]
+        [Authorize]
+        public async Task<ActionResult> SearchResearchesAsync(string searchQuery, int pageNumber)
+        {
+            var (researches, numberResearches) = await _researchService.SearchResearchesAsync(searchQuery, pageNumber);
 
             var response = researches.Select(r => new GetResearchesResponse(r.Id, r.ResearchName, r.Product.ProductName)).ToList();
 

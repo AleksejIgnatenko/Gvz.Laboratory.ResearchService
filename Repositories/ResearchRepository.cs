@@ -43,6 +43,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
         public async Task<(List<ResearchModel> researches, int numberResearches)> GetResearchesByProductIdForPageAsync(Guid productId, int pageNumber)
         {
             var researchEntities = await _context.Researches
+                    .AsNoTracking()
                     .Where(r => r.Product.Id == productId)
                     .Include(r => r.Product)
                     .Skip(pageNumber * 20)
@@ -71,6 +72,23 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                 false).research).ToList();
 
             return (researches, numberResearches);
+        }
+
+        public async Task<List<ResearchModel>> GetResearchesAsync()
+        {
+            var researchEntities = await _context.Researches
+                    .AsNoTracking()
+                    .Include(r => r.Product)
+                    .OrderByDescending(r => r.DateCreate)
+                    .ToListAsync();
+
+            var researches = researchEntities.Select(r => ResearchModel.Create(
+                r.Id,
+                r.ResearchName,
+                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                false).research).ToList();
+
+            return researches;
         }
 
         public async Task<(List<ResearchModel> researches, int numberResearches)> GetResearchesForPageAsync(int pageNumber)
@@ -129,6 +147,35 @@ namespace Gvz.Laboratory.ResearchService.Repositories
 
             return researches;
         }
+
+        public async Task<(List<ResearchModel> researches, int numberResearches)> SearchResearchesAsync(string searchQuery, int pageNumber)
+        {
+            var researchEntities = await _context.Researches
+                    .AsNoTracking()
+                    .Include(r => r.Product)
+                    .Where(r => 
+                        r.ResearchName.ToLower().Contains(searchQuery.ToLower()) ||
+                        r.Product.ProductName.ToLower().Contains(searchQuery.ToLower()))
+                    .OrderByDescending(r => r.DateCreate)
+                    .Skip(pageNumber * 20)
+                    .Take(20)
+                    .ToListAsync();
+
+            var numberResearches = await _context.Researches
+                    .AsNoTracking()
+                    .CountAsync(r =>
+                        r.ResearchName.ToLower().Contains(searchQuery.ToLower()) ||
+                        r.Product.ProductName.ToLower().Contains(searchQuery.ToLower()));
+
+            var researches = researchEntities.Select(r => ResearchModel.Create(
+                r.Id,
+                r.ResearchName,
+                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                false).research).ToList();
+
+            return (researches, numberResearches);
+        }
+
 
         public async Task<Guid> UpdateResearchAsync(ResearchModel research, Guid productId)
         {

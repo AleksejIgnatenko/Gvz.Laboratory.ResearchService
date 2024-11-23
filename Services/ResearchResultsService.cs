@@ -2,6 +2,7 @@
 using Gvz.Laboratory.ResearchService.Dto;
 using Gvz.Laboratory.ResearchService.Exceptions;
 using Gvz.Laboratory.ResearchService.Models;
+using OfficeOpenXml;
 
 namespace Gvz.Laboratory.ResearchService.Services
 {
@@ -23,6 +24,42 @@ namespace Gvz.Laboratory.ResearchService.Services
         public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByPartyIdForPageAsync(Guid partyId, int pageNumber)
         {
             return await _researchResultsRepository.GetResearchResultsByPartyIdForPageAsync(partyId, pageNumber);
+        }
+
+        public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> SearchResearchResultsAsync(string searchQuery, int pageNumber)
+        {
+            return await _researchResultsRepository.SearchResearchResultsAsync(searchQuery, pageNumber);
+        }
+
+        public async Task<MemoryStream> ExportResearchResultsToExcelAsync()
+        {
+            var manufacturers = await _researchResultsRepository.GetResearchResultsAsync();
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Manufacturers");
+
+                worksheet.Cells[1, 1].Value = "Id";
+                worksheet.Cells[1, 2].Value = "Название исследования";
+                worksheet.Cells[1, 3].Value = "Номер партии";
+                worksheet.Cells[1, 4].Value = "Результат";
+
+                for (int i = 0; i < manufacturers.Count; i++)
+                {
+                    worksheet.Cells[i + 2, 1].Value = manufacturers[i].Id;
+                    worksheet.Cells[i + 2, 2].Value = manufacturers[i].Research.ResearchName;
+                    worksheet.Cells[i + 2, 3].Value = manufacturers[i].Party.BatchNumber;
+                    worksheet.Cells[i + 2, 4].Value = manufacturers[i].Result;
+                }
+
+                worksheet.Cells.AutoFitColumns();
+
+                var stream = new MemoryStream();
+                await package.SaveAsAsync(stream);
+
+                stream.Position = 0; // Сбрасываем поток
+                return stream;
+            }
         }
 
         public async Task<Guid> UpdateResearchResultAsync(Guid id, string result)

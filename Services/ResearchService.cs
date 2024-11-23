@@ -2,6 +2,7 @@
 using Gvz.Laboratory.ResearchService.Dto;
 using Gvz.Laboratory.ResearchService.Exceptions;
 using Gvz.Laboratory.ResearchService.Models;
+using OfficeOpenXml;
 
 namespace Gvz.Laboratory.ResearchService.Services
 {
@@ -45,6 +46,40 @@ namespace Gvz.Laboratory.ResearchService.Services
         public async Task<(List<ResearchModel> researches, int numberResearches)> GetResearchesForPageAsync(int pageNumber)
         {
             return await _researchRepository.GetResearchesForPageAsync(pageNumber);
+        }
+
+        public async Task<(List<ResearchModel> researches, int numberResearches)> SearchResearchesAsync(string searchQuery, int pageNumber)
+        {
+            return await _researchRepository.SearchResearchesAsync(searchQuery, pageNumber);
+        }
+
+        public async Task<MemoryStream> ExportResearchesToExcelAsync()
+        {
+            var manufacturers = await _researchRepository.GetResearchesAsync();
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Manufacturers");
+
+                worksheet.Cells[1, 1].Value = "Id";
+                worksheet.Cells[1, 2].Value = "Название исследования";
+                worksheet.Cells[1, 3].Value = "Продукт";
+
+                for (int i = 0; i < manufacturers.Count; i++)
+                {
+                    worksheet.Cells[i + 2, 1].Value = manufacturers[i].Id;
+                    worksheet.Cells[i + 2, 2].Value = manufacturers[i].ResearchName;
+                    worksheet.Cells[i + 2, 3].Value = manufacturers[i].Product.ProductName;
+                }
+
+                worksheet.Cells.AutoFitColumns();
+
+                var stream = new MemoryStream();
+                await package.SaveAsAsync(stream);
+
+                stream.Position = 0; // Сбрасываем поток
+                return stream;
+            }
         }
 
         public async Task<Guid> UpdateResearchAsync(Guid id, string name, Guid productId)

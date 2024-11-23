@@ -1,6 +1,7 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Contracts;
 using Gvz.Laboratory.ResearchService.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gvz.Laboratory.ResearchService.Controllers
@@ -43,6 +44,31 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         public async Task<ActionResult> GetResearchResultsByPartyIdForPageAsync(Guid partyId, int pageNumber)
         {
             var (researchResults, numberResearchResults) = await _researchResultsService.GetResearchResultsByPartyIdForPageAsync(partyId, pageNumber);
+
+            var response = researchResults.Select(r => new GetResearchResultsResponse(r.Id, r.Research.ResearchName, r.Party.BatchNumber, r.Result)).ToList();
+
+            var responseWrapper = new GetResearchResultsResponseWrapper(response, numberResearchResults);
+
+            return Ok(responseWrapper);
+        }
+
+        [HttpGet]
+        [Route("exportResearchResultsToExcel")]
+        [Authorize]
+        public async Task<ActionResult> ExportResearchResultsToExcelAsync()
+        {
+            var stream = await _researchResultsService.ExportResearchResultsToExcelAsync();
+            var fileName = "ResearchResults.xlsx";
+
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        [HttpGet]
+        [Route("searchResearchResults")]
+        [Authorize]
+        public async Task<ActionResult> SearchResearchResultsAsync(string searchQuery, int pageNumber)
+        {
+            var (researchResults, numberResearchResults) = await _researchResultsService.SearchResearchResultsAsync(searchQuery, pageNumber);
 
             var response = researchResults.Select(r => new GetResearchResultsResponse(r.Id, r.Research.ResearchName, r.Party.BatchNumber, r.Result)).ToList();
 
