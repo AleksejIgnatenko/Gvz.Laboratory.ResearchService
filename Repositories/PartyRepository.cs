@@ -49,52 +49,42 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             return party.Id;
         }
 
-        public async Task<(List<PartyModel> parties, int numberParties)> GetUserPartiesForPageAsync(Guid userId, int pageNumber)
-        {
-            var partyEntities = await _context.Parties
-                    .AsNoTracking()
-                    .Skip(pageNumber * 20)
-                    .Take(20)
-                    .ToListAsync();
-
-            if (!partyEntities.Any() && pageNumber != 0)
-            {
-                pageNumber--;
-                partyEntities = await _context.Parties
-                    .AsNoTracking()
-                    .Skip(pageNumber * 20)
-                    .Take(20)
-                    .ToListAsync();
-            }
-
-            var numberParties = await _context.Parties.CountAsync();
-
-            var parties = partyEntities.Select(p => PartyModel.Create(
-                p.Id,
-                p.BatchNumber,
-                p.DateOfReceipt,
-                p.ProductName,
-                p.SupplierName,
-                p.ManufacturerName,
-                p.BatchSize,
-                p.SampleSize,
-                p.TTN,
-                p.DocumentOnQualityAndSafety,
-                p.TestReport,
-                p.DateOfManufacture,
-                p.ExpirationDate,
-                p.Packaging,
-                p.Marking,
-                p.Surname,
-                p.Note
-                )).ToList();
-
-            return (parties, numberParties);
-        }
-
         public async Task<PartyEntity?> GetPartyEntityByIdAsync(Guid id)
         {
             return await _context.Parties.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task<PartyModel> GetPartiesAsync(Guid partyId)
+        {
+            var partyEntities = await _context.Parties
+                    .AsNoTracking()
+                    .Include(p => p.ResearchResults)
+                    .ThenInclude(r => r.Research)
+                    .FirstOrDefaultAsync(p => p.Id == partyId);
+
+
+            var parties = PartyModel.Create(
+                partyEntities.Id,
+                partyEntities.BatchNumber,
+                partyEntities.DateOfManufacture,
+                partyEntities.ProductName,
+                partyEntities.SupplierName,
+                partyEntities.ManufacturerName,
+                partyEntities.BatchSize,
+                partyEntities.SampleSize,
+                partyEntities.TTN,
+                partyEntities.DocumentOnQualityAndSafety,
+                partyEntities.TestReport,
+                partyEntities.DateOfManufacture,
+                partyEntities.ExpirationDate,
+                partyEntities.Packaging,
+                partyEntities.Marking,
+                partyEntities.Result,
+                partyEntities.Surname,
+                partyEntities.Note,
+                partyEntities.ResearchResults.Select(r => ResearchResultModel.Create(r.Id, ResearchModel.Create(r.Research.Id, r.Research.ResearchName, false).research, r.Result, false).researchResult).ToList());
+
+            return parties;
         }
 
         public async Task<Guid> UpdatePartyAsync(PartyDto party)

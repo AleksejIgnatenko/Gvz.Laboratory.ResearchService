@@ -74,6 +74,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                         r.Party.ExpirationDate,
                         r.Party.Packaging,
                         r.Party.Marking,
+                        r.Party.Result,
                         r.Party.Surname,
                         r.Party.Note),
                     r.Result,
@@ -128,6 +129,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                         r.Party.ExpirationDate,
                         r.Party.Packaging,
                         r.Party.Marking,
+                        r.Party.Result,
                         r.Party.Surname,
                         r.Party.Note),
                     r.Result,
@@ -182,6 +184,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                         r.Party.ExpirationDate,
                         r.Party.Packaging,
                         r.Party.Marking,
+                        r.Party.Result,
                         r.Party.Surname,
                         r.Party.Note),
                     r.Result,
@@ -232,9 +235,10 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                         r.Party.ExpirationDate,
                         r.Party.Packaging,
                         r.Party.Marking,
+                        r.Party.Result,
                         r.Party.Surname,
                         r.Party.Note),
-                    r.Result,
+                        r.Result,
                     false).researchResult).ToList();
 
             return (researchResults, numberResearchResults);

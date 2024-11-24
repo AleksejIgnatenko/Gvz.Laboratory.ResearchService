@@ -18,6 +18,13 @@ namespace Gvz.Laboratory.ResearchService.Models
             Result = result;
         }
 
+        public ResearchResultModel(Guid id, ResearchModel research, string result)
+        {
+            Id = id;
+            Research = research;
+            Result = result;
+        }
+
         public ResearchResultModel(Guid id, ResearchModel research, PartyModel party, string result)
         {
             Id = id;
@@ -31,6 +38,26 @@ namespace Gvz.Laboratory.ResearchService.Models
             Dictionary<string, string> errors = new Dictionary<string, string>();
 
             ResearchResultModel researchResult = new ResearchResultModel(id, result);
+            if (!useValidation) { return (errors, researchResult); }
+
+            ResearchResultValidation researchResultValidation = new ResearchResultValidation();
+            ValidationResult validationResult = researchResultValidation.Validate(researchResult);
+            if (!validationResult.IsValid)
+            {
+                foreach (var failure in validationResult.Errors)
+                {
+                    errors[failure.PropertyName] = failure.ErrorMessage;
+                }
+            }
+
+            return (errors, researchResult);
+        }
+
+        public static (Dictionary<string, string> errors, ResearchResultModel researchResult) Create(Guid id, ResearchModel research, string result, bool useValidation = true)
+        {
+            Dictionary<string, string> errors = new Dictionary<string, string>();
+
+            ResearchResultModel researchResult = new ResearchResultModel(id, research, result);
             if (!useValidation) { return (errors, researchResult); }
 
             ResearchResultValidation researchResultValidation = new ResearchResultValidation();
