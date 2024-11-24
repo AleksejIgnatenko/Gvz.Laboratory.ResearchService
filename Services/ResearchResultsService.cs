@@ -36,37 +36,30 @@ namespace Gvz.Laboratory.ResearchService.Services
         {
             var manufacturers = await _researchResultsRepository.GetResearchResultsAsync();
 
-            using (var memoryStream = new MemoryStream())
+            using (var package = new ExcelPackage())
             {
-                // Создаем новый документ Word
-                using (var document = DocX.Create(memoryStream))
+                var worksheet = package.Workbook.Worksheets.Add("Manufacturers");
+
+                worksheet.Cells[1, 1].Value = "Id";
+                worksheet.Cells[1, 2].Value = "Название исследования";
+                worksheet.Cells[1, 3].Value = "Номер партии";
+                worksheet.Cells[1, 4].Value = "Результат";
+
+                for (int i = 0; i < manufacturers.Count; i++)
                 {
-                    // Добавляем заголовок
-                    document.InsertParagraph("Результаты исследований").FontSize(20).Bold().SpacingAfter(20);
-
-                    // Создаем таблицу
-                    var table = document.InsertTable(manufacturers.Count + 1, 4);
-                    table.Rows[0].Cells[0].Paragraphs[0].Append("Id").Bold();
-                    table.Rows[0].Cells[1].Paragraphs[0].Append("Название исследования").Bold();
-                    table.Rows[0].Cells[2].Paragraphs[0].Append("Номер партии").Bold();
-                    table.Rows[0].Cells[3].Paragraphs[0].Append("Результат").Bold();
-
-                    // Заполняем таблицу данными
-                    for (int i = 0; i < manufacturers.Count; i++)
-                    {
-                        table.Rows[i + 1].Cells[0].Paragraphs[0].Append(manufacturers[i].Id.ToString());
-                        table.Rows[i + 1].Cells[1].Paragraphs[0].Append(manufacturers[i].Research.ResearchName);
-                        table.Rows[i + 1].Cells[2].Paragraphs[0].Append(manufacturers[i].Party.BatchNumber.ToString());
-                        table.Rows[i + 1].Cells[3].Paragraphs[0].Append(manufacturers[i].Result);
-                    }
-
-                    // Сохраняем документ
-                    document.Save();
+                    worksheet.Cells[i + 2, 1].Value = manufacturers[i].Id;
+                    worksheet.Cells[i + 2, 2].Value = manufacturers[i].Research.ResearchName;
+                    worksheet.Cells[i + 2, 3].Value = manufacturers[i].Party.BatchNumber;
+                    worksheet.Cells[i + 2, 4].Value = manufacturers[i].Result;
                 }
 
-                // Сбрасываем позицию потока
-                memoryStream.Position = 0;
-                return memoryStream;
+                worksheet.Cells.AutoFitColumns();
+
+                var stream = new MemoryStream();
+                await package.SaveAsAsync(stream);
+
+                stream.Position = 0; // Сбрасываем поток
+                return stream;
             }
         }
 
