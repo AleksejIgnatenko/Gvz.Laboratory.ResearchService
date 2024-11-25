@@ -11,11 +11,11 @@ namespace Gvz.Laboratory.ResearchService.Kafka
         private readonly ConsumerConfig _config;
         private IConsumer<Ignore, string> _consumer;
         private CancellationTokenSource _cts;
-        private readonly IPartyRepository _partyRepository;
-        public UpdatePartyKafkaConsumer(ConsumerConfig config, IPartyRepository partyRepository = null)
+        private readonly IPartyService _partyService;
+        public UpdatePartyKafkaConsumer(ConsumerConfig config, IPartyService partyService)
         {
             _config = config;
-            _partyRepository = partyRepository;
+            _partyService = partyService;
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -35,7 +35,7 @@ namespace Gvz.Laboratory.ResearchService.Kafka
                         var cr = _consumer.Consume(cancellationToken);
                         var updatePartyDto = JsonSerializer.Deserialize<PartyDto>(cr.Message.Value)
                             ?? throw new InvalidOperationException("Deserialization failed: Party is null.");
-                        var updatePartyDtoId = await _partyRepository.UpdatePartyAsync(updatePartyDto);
+                        var updatePartyEntity = await _partyService.UpdatePartyAsync(updatePartyDto);
                     }
                     catch (ConsumeException e)
                     {

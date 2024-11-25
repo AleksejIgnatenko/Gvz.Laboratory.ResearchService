@@ -58,8 +58,8 @@ namespace Gvz.Laboratory.ResearchService.Repositories
         {
             var partyEntities = await _context.Parties
                     .AsNoTracking()
-                    .Include(p => p.ResearchResults)
-                    .ThenInclude(r => r.Research)
+                    .Include(p => p.ResearchResults.OrderBy(r => r.Research.ResearchName))
+                        .ThenInclude(r => r.Research)
                     .FirstOrDefaultAsync(p => p.Id == partyId);
 
 
@@ -87,31 +87,44 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             return parties;
         }
 
-        public async Task<Guid> UpdatePartyAsync(PartyDto party)
+        public async Task<PartyEntity> UpdatePartyAsync(PartyDto partyDto)
         {
-            var existingParty = await _context.Parties.FirstOrDefaultAsync(p => p.Id == party.Id)
-                ?? throw new InvalidOperationException($"Party with Id '{party.Id}' was not found.");
+            var existingParty = await _context.Parties
+                .Include(p => p.ResearchResults)
+                .FirstOrDefaultAsync(p => p.Id == partyDto.Id)
+                ?? throw new InvalidOperationException($"Party with Id '{partyDto.Id}' was not found.");
 
-            existingParty.BatchNumber = party.BatchNumber;
-            existingParty.DateOfReceipt = party.DateOfReceipt;
-            existingParty.ProductName = party.ProductName;
-            existingParty.SupplierName = party.SupplierName;
-            existingParty.ManufacturerName = party.ManufacturerName;
-            existingParty.BatchSize = party.BatchSize;
-            existingParty.SampleSize = party.SampleSize;
-            existingParty.TTN = party.TTN;
-            existingParty.DocumentOnQualityAndSafety = party.DocumentOnQualityAndSafety;
-            existingParty.TestReport = party.TestReport;
-            existingParty.DateOfManufacture = party.DateOfManufacture;
-            existingParty.ExpirationDate = party.ExpirationDate;
-            existingParty.Packaging = party.Packaging;
-            existingParty.Marking = party.Marking;
-            existingParty.Result = party.Result;
-            existingParty.Note = party.Note;
+            var partyEntity = await _context.Parties
+                .AsNoTracking()
+                .Include(p => p.ResearchResults)
+                .FirstOrDefaultAsync(p => p.Id == partyDto.Id)
+                ?? throw new InvalidOperationException($"Party with Id '{partyDto.Id}' was not found.");
+
+            if (!existingParty.ProductName.Equals(partyDto.ProductName))
+            {
+                existingParty.ResearchResults.Clear();
+            }
+
+            existingParty.BatchNumber = partyDto.BatchNumber;
+            existingParty.DateOfReceipt = partyDto.DateOfReceipt;
+            existingParty.ProductName = partyDto.ProductName;
+            existingParty.SupplierName = partyDto.SupplierName;
+            existingParty.ManufacturerName = partyDto.ManufacturerName;
+            existingParty.BatchSize = partyDto.BatchSize;
+            existingParty.SampleSize = partyDto.SampleSize;
+            existingParty.TTN = partyDto.TTN;
+            existingParty.DocumentOnQualityAndSafety = partyDto.DocumentOnQualityAndSafety;
+            existingParty.TestReport = partyDto.TestReport;
+            existingParty.DateOfManufacture = partyDto.DateOfManufacture;
+            existingParty.ExpirationDate = partyDto.ExpirationDate;
+            existingParty.Packaging = partyDto.Packaging;
+            existingParty.Marking = partyDto.Marking;
+            existingParty.Result = partyDto.Result;
+            existingParty.Note = partyDto.Note;
 
             await _context.SaveChangesAsync();
 
-            return party.Id;
+            return partyEntity;
         }
 
         public async Task DeletePartiesAsync(List<Guid> ids)

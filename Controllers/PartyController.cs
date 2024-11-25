@@ -15,7 +15,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         }
 
         [HttpGet]
-        [Route("creationOfAQualityAndSafetyCertificateAsync")]
+        [Route("creationOfAQualityAndSafetyCertificate")]
         //[Authorize]
         public async Task<ActionResult> CreationOfAQualityAndSafetyCertificateAsync(Guid partyId)
         {

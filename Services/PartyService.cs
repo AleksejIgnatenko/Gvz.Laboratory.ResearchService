@@ -27,6 +27,17 @@ namespace Gvz.Laboratory.ResearchService.Services
             return partyDto.Id;
         }
 
+        public async Task<Guid> UpdatePartyAsync(PartyDto partyDto)
+        {
+            var updatePartyEntity = await _partyRepository.UpdatePartyAsync(partyDto);
+            if(!partyDto.ProductName.Equals(updatePartyEntity.ProductName)) //Если продукт изменен создаем новый список результатов исследований
+            {
+                await _researchResultsRepository.CreateResearchResultsAsync(partyDto.Id, partyDto.ProductId);
+            }
+
+            return partyDto.Id;
+        }
+
         public async Task<MemoryStream> CreationOfAQualityAndSafetyCertificateAsync(Guid partyId)
         {
             var party = await _partyRepository.GetPartiesAsync(partyId);
@@ -102,26 +113,33 @@ namespace Gvz.Laboratory.ResearchService.Services
 
                 // Добавление таблицы
                 // Определим количество строк и столбцов
-                int rowCount = 2;
+                int rowCount = 3;
                 int columnCount = 4 + party.ResearchResult.Count; 
                 var table = document.InsertTable(rowCount, columnCount);
 
                 // Задаем заголовки для таблицы
-                table.Rows[0].Cells[0].Paragraphs[0].Append("№\nп/п")
+                table.Rows[0].Cells[3].Paragraphs[0].Append("Органолептические показатели")
+                    .Bold()
+                    .FontSize(fontSize)
+                    .Font(fontName)
+                    .Alignment = Alignment.center;
+                table.Rows[0].MergeCells(3, party.ResearchResult.Count + 2);
+
+                table.Rows[1].Cells[0].Paragraphs[0].Append("№\nп/п")
                     .Bold()
                     .FontSize(fontSize)
                     .Font(fontName)
                     .Alignment = Alignment.center;
 
 
-                table.Rows[0].Cells[1].Paragraphs[0].Append("Дата поступления")
+                table.Rows[1].Cells[1].Paragraphs[0].Append("Дата поступления")
                     .Bold()
                     .FontSize(fontSize)
                     .Font(fontName)
                     .Alignment = Alignment.center;
 
 
-                table.Rows[0].Cells[2].Paragraphs[0].Append("Наименование сырья")
+                table.Rows[1].Cells[2].Paragraphs[0].Append("Наименование сырья")
                     .Bold()
                     .FontSize(fontSize)
                     .Font(fontName)
@@ -129,14 +147,14 @@ namespace Gvz.Laboratory.ResearchService.Services
 
                 for (int i = 0; i < party.ResearchResult.Count; i++)
                 {
-                    table.Rows[0].Cells[i + 3].Paragraphs[0].Append(party.ResearchResult[i].Research.ResearchName)
+                    table.Rows[1].Cells[i + 3].Paragraphs[0].Append(party.ResearchResult[i].Research.ResearchName)
                         .Bold()
                         .FontSize(fontSize)
                         .Font(fontName)
                         .Alignment = Alignment.center;//Для результатов исследования
                 }
 
-                table.Rows[0].Cells[party.ResearchResult.Count + 1 + 2].Paragraphs[0].Append("Соответствие ТНПА")
+                table.Rows[1].Cells[party.ResearchResult.Count + 1 + 2].Paragraphs[0].Append("Соответствие ТНПА")
                     .Bold()
                     .FontSize(fontSize)
                     .Font(fontName)
@@ -145,30 +163,30 @@ namespace Gvz.Laboratory.ResearchService.Services
                 document.InsertParagraph("");
 
                 // Заполнение таблицы данными
-                table.Rows[1].Cells[0].Paragraphs[0].Append(party.BatchNumber.ToString())
+                table.Rows[2].Cells[0].Paragraphs[0].Append(party.BatchNumber.ToString())
                     .FontSize(fontSize)
                     .Font(fontName)
                     .Alignment = Alignment.center;
 
-                table.Rows[1].Cells[1].Paragraphs[0].Append(party.DateOfReceipt)
+                table.Rows[2].Cells[1].Paragraphs[0].Append(party.DateOfReceipt)
                     .FontSize(fontSize)
                     .Font(fontName)
                     .Alignment = Alignment.center;
 
-                table.Rows[1].Cells[2].Paragraphs[0].Append(party.ProductName)
+                table.Rows[2].Cells[2].Paragraphs[0].Append(party.ProductName)
                     .FontSize(fontSize)
                     .Font(fontName)
                     .Alignment = Alignment.center;
 
                 for (int i = 0; i < party.ResearchResult.Count; i++)
                 {
-                    table.Rows[1].Cells[i + 3].Paragraphs[0].Append(party.ResearchResult[i].Result)
+                    table.Rows[2].Cells[i + 3].Paragraphs[0].Append(party.ResearchResult[i].Result)
                         .FontSize(fontSize)
                         .Font(fontName)
                         .Alignment = Alignment.center;//Результаты исследования
                 }
 
-                table.Rows[1].Cells[party.ResearchResult.Count + 1 + 2].Paragraphs[0].Append("Соответствует требованиям ГОСТ 33222-2015")
+                table.Rows[2].Cells[party.ResearchResult.Count + 1 + 2].Paragraphs[0].Append("Соответствует требованиям ГОСТ 33222-2015")
                     .FontSize(fontSize)
                     .Font(fontName)
                     .Alignment = Alignment.center; ;

@@ -22,8 +22,12 @@ namespace Gvz.Laboratory.ResearchService.Repositories
         public async Task CreateResearchResultsAsync(Guid partyId, Guid productId)
         {
             var partyEntity = await _partyRepository.GetPartyEntityByIdAsync(partyId);
+            //Console.WriteLine("222222222222222222222");
+            //Console.WriteLine(partyEntity.Id);
 
             var productResearchEntities = await _researchRepository.GetResearchEntitiesByProductIdAsync(productId);
+            //Console.WriteLine("33333333333333333333333");
+            //Console.WriteLine(productResearchEntities[0].Id);
 
             if ((productResearchEntities != null) && (partyEntity != null))
             {
@@ -88,6 +92,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researchResultEntities = await _context.ResearchResults
                     .AsNoTracking()
                     .Where(r => r.Research.Id == researchId)
+                    .OrderBy(r => r.Research.ResearchName)
                     .Include(r => r.Research)
                     .Include(r => r.Party)
                     .Skip(pageNumber * 20)
@@ -98,7 +103,9 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             {
                 pageNumber--;
                 researchResultEntities = await _context.ResearchResults
+                    .AsNoTracking()
                     .Where(r => r.Research.Id == researchId)
+                    .OrderBy(r => r.Research.ResearchName)
                     .Include(r => r.Research)
                     .Include(r => r.Party)
                     .Skip(pageNumber * 20)
@@ -143,6 +150,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researchResultEntities = await _context.ResearchResults
                     .AsNoTracking()
                     .Where(r => r.Party.Id == partyId)
+                    .OrderBy(r => r.Research.ResearchName)
                     .Include(r => r.Research)
                     .Include(r => r.Party)
                     .Skip(pageNumber * 20)
@@ -153,7 +161,9 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             {
                 pageNumber--;
                 researchResultEntities = await _context.ResearchResults
+                    .AsNoTracking()
                     .Where(r => r.Party.Id == partyId)
+                    .OrderBy(r => r.Research.ResearchName)
                     .Include(r => r.Research)
                     .Include(r => r.Party)
                     .Skip(pageNumber * 20)
