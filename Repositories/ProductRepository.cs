@@ -25,6 +25,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                 var productEntity = new ProductEntity
                 {
                     Id = product.Id,
+                    UnitsOfMeasurement = product.UnitsOfMeasurement,
                     ProductName = product.ProductName,
                 };
 
@@ -46,7 +47,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                 throw new RepositoryException("Продукт не найден");
             }
 
-            var product = ProductModel.Create(researchEntity.Product.Id, researchEntity.Product.ProductName);
+            var product = ProductModel.Create(researchEntity.Product.Id, researchEntity.Product.ProductName, researchEntity.Product.UnitsOfMeasurement);
 
             return product;
         }
@@ -57,12 +58,19 @@ namespace Gvz.Laboratory.ResearchService.Repositories
                 .FirstOrDefaultAsync(p => p.Id == productId);
         }
 
+        public async Task<ProductEntity?> GetProductByNameAsync(string productName)
+        {
+            return await _context.Products
+                .FirstOrDefaultAsync(p => p.ProductName.Equals(productName));
+        }
+
         public async Task<Guid> UpdateProductAsync(ProductDto product)
         {
             await _context.Products 
-                .Where(s => s.Id == product.Id)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(s => s.ProductName, product.ProductName)
+                .Where(p => p.Id == product.Id)
+                .ExecuteUpdateAsync(p => p
+                    .SetProperty(p => p.ProductName, product.ProductName)
+                    .SetProperty(p => p.UnitsOfMeasurement, product.UnitsOfMeasurement) 
                  );
 
             return product.Id;

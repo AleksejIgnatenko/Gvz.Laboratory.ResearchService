@@ -11,7 +11,7 @@ namespace Gvz.Laboratory.ResearchService.Kafka
         private IConsumer<Ignore, string> _consumer;
         private CancellationTokenSource _cts;
         private readonly IPartyRepository _partyRepository;
-        public DeletePartyKafkaConsumer(ConsumerConfig config, IPartyRepository partyRepository = null)
+        public DeletePartyKafkaConsumer(ConsumerConfig config, IPartyRepository partyRepository)
         {
             _config = config;
             _partyRepository = partyRepository;

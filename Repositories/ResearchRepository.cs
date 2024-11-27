@@ -68,7 +68,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researches = researchEntities.Select(r => ResearchModel.Create(
                 r.Id,
                 r.ResearchName,
-                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                ProductModel.Create(r.Product.Id, r.Product.ProductName, r.Product.UnitsOfMeasurement),
                 false).research).ToList();
 
             return (researches, numberResearches);
@@ -85,7 +85,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researches = researchEntities.Select(r => ResearchModel.Create(
                 r.Id,
                 r.ResearchName,
-                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                ProductModel.Create(r.Product.Id, r.Product.ProductName, r.Product.UnitsOfMeasurement),
                 false).research).ToList();
 
             return researches;
@@ -118,7 +118,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researches = researchEntities.Select(r => ResearchModel.Create(
                 r.Id,
                 r.ResearchName,
-                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                ProductModel.Create(r.Product.Id, r.Product.ProductName, r.Product.UnitsOfMeasurement),
                 false).research).ToList();
 
             return (researches, numberResearches);
@@ -142,7 +142,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researches = researchEntities.Select(r => ResearchModel.Create(
                 r.Id,
                 r.ResearchName,
-                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                ProductModel.Create(r.Product.Id, r.Product.ProductName, r.Product.UnitsOfMeasurement),
                 false).research).ToList();
 
             return researches;
@@ -170,7 +170,7 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             var researches = researchEntities.Select(r => ResearchModel.Create(
                 r.Id,
                 r.ResearchName,
-                ProductModel.Create(r.Product.Id, r.Product.ProductName),
+                ProductModel.Create(r.Product.Id, r.Product.ProductName, r.Product.UnitsOfMeasurement),
                 false).research).ToList();
 
             return (researches, numberResearches);

@@ -9,6 +9,7 @@ namespace Gvz.Laboratory.ResearchService.Abstractions
         Task<Guid> CreateProductAsync(ProductDto product);
         Task<ProductModel> GetProductForResearchIdAsync(Guid researchId);
         Task<ProductEntity?> GetProductByIdAsync(Guid productId);
+        Task<ProductEntity?> GetProductByNameAsync(string productName);
         Task<Guid> UpdateProductAsync(ProductDto product);
         Task DeleteProductsAsync(List<Guid> ids);
     }

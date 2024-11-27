@@ -1,4 +1,5 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gvz.Laboratory.ResearchService.Controllers
@@ -16,7 +17,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
 
         [HttpGet]
         [Route("creationOfAQualityAndSafetyCertificate")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> CreationOfAQualityAndSafetyCertificateAsync(Guid partyId)
         {
             var stream = await _partyService.CreationOfAQualityAndSafetyCertificateAsync(partyId);

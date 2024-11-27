@@ -10,12 +10,14 @@ namespace Gvz.Laboratory.ResearchService.Services
         private readonly IPartyRepository _partyRepository;
         private readonly IResearchRepository _researchRepository;
         private readonly IResearchResultsRepository _researchResultsRepository;
+        private readonly IProductRepository _productRepository;
 
-        public PartyService(IPartyRepository partyRepository, IResearchRepository researchRepository, IResearchResultsRepository researchResultsRepository)
+        public PartyService(IPartyRepository partyRepository, IResearchRepository researchRepository, IResearchResultsRepository researchResultsRepository, IProductRepository productRepository)
         {
             _partyRepository = partyRepository;
             _researchRepository = researchRepository;
             _researchResultsRepository = researchResultsRepository;
+            _productRepository = productRepository;
         }
 
         public async Task<Guid> CreatePartyAsync(PartyDto partyDto)
@@ -41,6 +43,7 @@ namespace Gvz.Laboratory.ResearchService.Services
         public async Task<MemoryStream> CreationOfAQualityAndSafetyCertificateAsync(Guid partyId)
         {
             var party = await _partyRepository.GetPartiesAsync(partyId);
+            var product = await _productRepository.GetProductByNameAsync(party.ProductName);
 
             var memoryStream = new MemoryStream(); // Создаем поток без использования using
 
@@ -99,7 +102,7 @@ namespace Gvz.Laboratory.ResearchService.Services
                     .FontSize(fontSize)
                     .Font(fontName)
 
-                    .Append($"   Количество, ")
+                    .Append($"   Количество, {product.UnitsOfMeasurement} ")
                     .FontSize(fontSize)
                     .Font(fontName)
 
