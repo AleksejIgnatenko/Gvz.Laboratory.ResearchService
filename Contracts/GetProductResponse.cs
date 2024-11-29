@@ -2,6 +2,7 @@
 {
     public record GetProductResponse(
         Guid Id,
-        string ProductName
+        string ProductName,
+        string UnitsOfMeasurement
         );
 }

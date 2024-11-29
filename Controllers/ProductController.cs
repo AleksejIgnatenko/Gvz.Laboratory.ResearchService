@@ -22,7 +22,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         {
             var product = await _productService.GetProductForResearchIdAsync(researchId);
 
-            var response = new GetProductResponse(product.Id, product.ProductName);
+            var response = new GetProductResponse(product.Id, product.ProductName, product.UnitsOfMeasurement);
 
             return Ok(response);
         }

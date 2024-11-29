@@ -1,5 +1,6 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Dto;
+using System.Drawing;
 using Xceed.Document.NET;
 using Xceed.Words.NET;
 
@@ -121,32 +122,37 @@ namespace Gvz.Laboratory.ResearchService.Services
                 var table = document.InsertTable(rowCount, columnCount);
 
                 // Задаем заголовки для таблицы
+                table.Rows[0].Cells[0].Paragraphs[0].Append("№\nп/п")
+                    .Bold()
+                    .FontSize(fontSize)
+                    .Font(fontName)
+                    .Alignment = Alignment.center;
+                // Изменение нижней границы
+                table.Rows[0].Cells[0].SetBorder(TableCellBorderType.Bottom, new Border(BorderStyle.Tcbs_outset, 0, 0, Color.Transparent));
+
+                table.Rows[0].Cells[1].Paragraphs[0].Append("Дата поступления")
+                    .Bold()
+                    .FontSize(fontSize)
+                    .Font(fontName)
+                    .Alignment = Alignment.center;
+                // Изменение нижней границы
+                table.Rows[0].Cells[1].SetBorder(TableCellBorderType.Bottom, new Border(BorderStyle.Tcbs_outset, 0, 0, Color.Transparent));
+
+
+                table.Rows[0].Cells[2].Paragraphs[0].Append("Наименование сырья")
+                    .Bold()
+                    .FontSize(fontSize)
+                    .Font(fontName)
+                    .Alignment = Alignment.center;
+                // Изменение нижней границы
+                table.Rows[0].Cells[2].SetBorder(TableCellBorderType.Bottom, new Border(BorderStyle.Tcbs_outset, 0, 0, Color.Transparent));
+
                 table.Rows[0].Cells[3].Paragraphs[0].Append("Органолептические показатели")
                     .Bold()
                     .FontSize(fontSize)
                     .Font(fontName)
                     .Alignment = Alignment.center;
                 table.Rows[0].MergeCells(3, party.ResearchResult.Count + 2);
-
-                table.Rows[1].Cells[0].Paragraphs[0].Append("№\nп/п")
-                    .Bold()
-                    .FontSize(fontSize)
-                    .Font(fontName)
-                    .Alignment = Alignment.center;
-
-
-                table.Rows[1].Cells[1].Paragraphs[0].Append("Дата поступления")
-                    .Bold()
-                    .FontSize(fontSize)
-                    .Font(fontName)
-                    .Alignment = Alignment.center;
-
-
-                table.Rows[1].Cells[2].Paragraphs[0].Append("Наименование сырья")
-                    .Bold()
-                    .FontSize(fontSize)
-                    .Font(fontName)
-                    .Alignment = Alignment.center;
 
                 for (int i = 0; i < party.ResearchResult.Count; i++)
                 {
@@ -157,11 +163,14 @@ namespace Gvz.Laboratory.ResearchService.Services
                         .Alignment = Alignment.center;//Для результатов исследования
                 }
 
-                table.Rows[1].Cells[party.ResearchResult.Count + 1 + 2].Paragraphs[0].Append("Соответствие ТНПА")
+                table.Rows[0].Cells[party.ResearchResult.Count + 2].Paragraphs[0].Append("Соответствие ТНПА")
                     .Bold()
                     .FontSize(fontSize)
                     .Font(fontName)
                     .Alignment = Alignment.center;
+
+                // Изменение нижней границы
+                table.Rows[0].Cells[party.ResearchResult.Count + 2].SetBorder(TableCellBorderType.Bottom, new Border(BorderStyle.Tcbs_outset, 0, 0, Color.Transparent));
 
                 document.InsertParagraph("");
 
@@ -189,10 +198,10 @@ namespace Gvz.Laboratory.ResearchService.Services
                         .Alignment = Alignment.center;//Результаты исследования
                 }
 
-                table.Rows[2].Cells[party.ResearchResult.Count + 1 + 2].Paragraphs[0].Append("Соответствует требованиям ГОСТ 33222-2015")
+                table.Rows[2].Cells[party.ResearchResult.Count + 3].Paragraphs[0].Append("Соответствует требованиям ГОСТ 33222-2015")
                     .FontSize(fontSize)
                     .Font(fontName)
-                    .Alignment = Alignment.center; ;
+                    .Alignment = Alignment.center;
 
                 document.InsertParagraph("");
 
