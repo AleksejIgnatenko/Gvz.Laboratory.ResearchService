@@ -47,6 +47,36 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             }
         }
 
+        public async Task<Guid> AddResearchResultToPartiesAsync(ResearchEntity researchEntity, List<PartyEntity> partyEntities)
+        {
+            if ((researchEntity != null) && (partyEntities.Count > 0))
+            {
+                var parties = await _context.Parties.Where(p => p.ProductName == researchEntity.Product.ProductName)
+                                             .Include(p => p.ResearchResults)
+                                             .ToListAsync();
+
+                foreach (var party in parties)
+                {
+                    var researchResultEntity = new ResearchResultEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        Research = researchEntity,
+                        Party = party,
+                        Result = string.Empty,
+                        DateCreate = DateTime.Now,
+                    };
+
+                    await _context.ResearchResults.AddAsync(researchResultEntity);
+                    party.ResearchResults.Add(researchResultEntity);
+                }
+
+                await _context.SaveChangesAsync();
+                return researchEntity.Id;
+            }
+
+            return researchEntity.Id;
+        }
+
         public async Task<List<ResearchResultModel>> GetResearchResultsAsync()
         {
             var researchResultEntities = await _context.ResearchResults

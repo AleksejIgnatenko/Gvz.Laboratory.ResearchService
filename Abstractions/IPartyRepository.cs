@@ -9,6 +9,7 @@ namespace Gvz.Laboratory.ResearchService.Abstractions
         Task<Guid> CreatePartyAsync(PartyDto party);
         Task DeletePartiesAsync(List<Guid> ids);
         Task<PartyEntity?> GetPartyEntityByIdAsync(Guid id);
+        Task<List<PartyEntity>?> GetPartyEntityByProductNameAsync(string productName);
         Task<PartyModel> GetPartiesAsync(Guid partyId);
         Task<PartyEntity> UpdatePartyAsync(PartyDto party);
     }

@@ -3,18 +3,38 @@ using Gvz.Laboratory.ResearchService.Dto;
 using Gvz.Laboratory.ResearchService.Exceptions;
 using Gvz.Laboratory.ResearchService.Models;
 using OfficeOpenXml;
-using Xceed.Words.NET;
 
 namespace Gvz.Laboratory.ResearchService.Services
 {
     public class ResearchResultsService : IResearchResultsService
     {
         private readonly IResearchResultsRepository _researchResultsRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IPartyRepository _partyRepository;
+        private readonly IResearchRepository _researchRepository;
         private readonly IKafkaProducer _kafkaProducer;
-        public ResearchResultsService(IResearchResultsRepository researchResultsRepository, IKafkaProducer kafkaProducer)
+        public ResearchResultsService(IResearchResultsRepository researchResultsRepository, IKafkaProducer kafkaProducer, IProductRepository productRepository, IPartyRepository partyRepository, IResearchRepository researchRepository)
         {
             _researchResultsRepository = researchResultsRepository;
             _kafkaProducer = kafkaProducer;
+            _productRepository = productRepository;
+            _partyRepository = partyRepository;
+            _researchRepository = researchRepository;
+        }
+
+        public async Task<Guid> AddResearchResultToParties(Guid researchId, Guid productId)
+        {
+            var productEntity = await _productRepository.GetProductByIdAsync(productId);
+
+            var researchEntity = await _researchRepository.GetResearchEntitiesByIdAsync(researchId);
+
+            var partyEntities = await _partyRepository.GetPartyEntityByProductNameAsync(productEntity.ProductName);
+            Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaa");
+            Console.WriteLine(partyEntities.Count);
+
+            var researchResultId = await _researchResultsRepository.AddResearchResultToPartiesAsync(researchEntity, partyEntities);
+
+            return researchResultId;
         }
 
         public async Task<(List<ResearchResultModel> researchResults, int numberResearchResults)> GetResearchResultsByResearchIdForPageAsync(Guid researchId, int pageNumber)

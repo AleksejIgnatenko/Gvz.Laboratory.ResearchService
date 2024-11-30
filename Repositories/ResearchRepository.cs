@@ -130,12 +130,19 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             return await _context.Researches
                 .Where(r => r.Product.Id == productId)
                 .ToListAsync();
-            ;
+        }
+
+        public async Task<ResearchEntity?> GetResearchEntitiesByIdAsync(Guid researchId)
+        {
+            return await _context.Researches
+                .Include(r => r.Product)
+                .FirstOrDefaultAsync(r => r.Id == researchId);
         }
 
         public async Task<List<ResearchModel>?> GetResearchesByProductIdAsync(Guid productId)
         {
             var researchEntities = await _context.Researches
+                .AsNoTracking()
                 .Where(r => r.Product.Id == productId)
                 .ToListAsync();
 

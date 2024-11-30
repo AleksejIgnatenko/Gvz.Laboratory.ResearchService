@@ -54,6 +54,13 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             return await _context.Parties.FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<List<PartyEntity>?> GetPartyEntityByProductNameAsync(string productName)
+        {
+            return await _context.Parties.Where(p => p.ProductName == productName)
+                                         .Include(p => p.ResearchResults)
+                                         .ToListAsync();
+        }
+
         public async Task<PartyModel> GetPartiesAsync(Guid partyId)
         {
             var partyEntities = await _context.Parties

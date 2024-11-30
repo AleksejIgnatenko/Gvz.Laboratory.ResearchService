@@ -9,12 +9,14 @@ namespace Gvz.Laboratory.ResearchService.Services
     public class ResearchService : IResearchService
     {
         private readonly IResearchRepository _researchRepository;
+        private readonly IResearchResultsService _researchResultsService;
         private readonly IKafkaProducer _researchKafkaProducer;
 
-        public ResearchService(IResearchRepository researchRepository, IKafkaProducer researchKafkaProducer)
+        public ResearchService(IResearchRepository researchRepository, IKafkaProducer researchKafkaProducer, IResearchResultsService resultsService)
         {
             _researchRepository = researchRepository;
             _researchKafkaProducer = researchKafkaProducer;
+            _researchResultsService = resultsService;
         }
 
         public async Task<Guid> CreateResearchAsync(Guid id, string name, Guid productId)
@@ -26,6 +28,8 @@ namespace Gvz.Laboratory.ResearchService.Services
             }
 
             var researchId = await _researchRepository.CreateResearchAsync(research, productId);
+
+            var researchResultId = await _researchResultsService.AddResearchResultToParties(research.Id, productId);
 
             ResearchDto researchDto = new ResearchDto
             {
