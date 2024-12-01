@@ -10,11 +10,13 @@ namespace Gvz.Laboratory.ResearchService.Repositories
     {
         private readonly GvzLaboratoryResearchServiceDbContext _context;
         private readonly IProductRepository _productRepository;
+        private readonly IResearchResultsService _researchResultsService;
 
-        public ResearchRepository(GvzLaboratoryResearchServiceDbContext context, IProductRepository productRepository)
+        public ResearchRepository(GvzLaboratoryResearchServiceDbContext context, IProductRepository productRepository, IResearchResultsService researchResultsService)
         {
             _context = context;
             _productRepository = productRepository;
+            _researchResultsService = researchResultsService;
         }
 
         public async Task<Guid> CreateResearchAsync(ResearchModel research, Guid productId)
@@ -186,31 +188,39 @@ namespace Gvz.Laboratory.ResearchService.Repositories
 
         public async Task<Guid> UpdateResearchAsync(ResearchModel research, Guid productId)
         {
-            var researchEntity = await _context.Researches
+            var existingResearch = await _context.Researches
                 .Include(r => r.Product)
+                .Include(r => r.ResearchResults)
                 .FirstOrDefaultAsync(r => r.Id == research.Id)
                 ?? throw new RepositoryException("Исследование не найдено");
 
             var existingResearchName = await _context.Researches
-                .Where(r => (r.Product.Id == productId) && (r.ResearchName == research.ResearchName) && (r.ResearchName != researchEntity.ResearchName))
+                .Where(r => (r.Product.Id == productId) && (r.ResearchName == research.ResearchName) && (r.ResearchName != existingResearch.ResearchName))
                 .FirstOrDefaultAsync();
 
             if (existingResearchName == null)
             {
+                if(existingResearch.Product.Id != productId)
+                {
+                    existingResearch.ResearchResults.Clear();
+                }
+
                 var existingProduct = await _productRepository.GetProductByIdAsync(productId)
                    ?? throw new RepositoryException("Продукт не найден");
 
-                researchEntity.ResearchName = research.ResearchName;
-                researchEntity.Product = existingProduct;
+                existingResearch.ResearchName = research.ResearchName;
+                existingResearch.Product = existingProduct;
 
                 await _context.SaveChangesAsync();
+
+                //var researchResultId = await _researchResultsService.AddResearchResultToParties(existingResearch.Id, existingResearch.Product.Id);
             }
             else
             {
                 throw new RepositoryException("У выбранного продукта уже есть исследование с таким названием.");
             }
 
-            return productId;
+            return research.Id;
         }
 
         public async Task DeleteResearchesAsync(List<Guid> ids)

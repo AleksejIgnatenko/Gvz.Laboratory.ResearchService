@@ -47,9 +47,9 @@ namespace Gvz.Laboratory.ResearchService.Repositories
             }
         }
 
-        public async Task<Guid> AddResearchResultToPartiesAsync(ResearchEntity researchEntity, List<PartyEntity> partyEntities)
+        public async Task<Guid> AddResearchResultToPartiesAsync(ResearchEntity researchEntity)
         {
-            if ((researchEntity != null) && (partyEntities.Count > 0))
+            if ((researchEntity != null))
             {
                 var parties = await _context.Parties.Where(p => p.ProductName == researchEntity.Product.ProductName)
                                              .Include(p => p.ResearchResults)

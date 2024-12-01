@@ -28,11 +28,7 @@ namespace Gvz.Laboratory.ResearchService.Services
 
             var researchEntity = await _researchRepository.GetResearchEntitiesByIdAsync(researchId);
 
-            var partyEntities = await _partyRepository.GetPartyEntityByProductNameAsync(productEntity.ProductName);
-            Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaa");
-            Console.WriteLine(partyEntities.Count);
-
-            var researchResultId = await _researchResultsRepository.AddResearchResultToPartiesAsync(researchEntity, partyEntities);
+            var researchResultId = await _researchResultsRepository.AddResearchResultToPartiesAsync(researchEntity);
 
             return researchResultId;
         }
