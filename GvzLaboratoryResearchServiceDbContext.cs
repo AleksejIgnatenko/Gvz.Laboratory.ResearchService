@@ -1,4 +1,5 @@
-﻿using Gvz.Laboratory.ResearchService.Entities;
+﻿using Gvz.Laboratory.ResearchService.ConfigurationsDb;
+using Gvz.Laboratory.ResearchService.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gvz.Laboratory.ResearchService
@@ -17,7 +18,9 @@ namespace Gvz.Laboratory.ResearchService
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //configuration db
+            modelBuilder.ApplyConfiguration(new ProductConfiguration());
+            modelBuilder.ApplyConfiguration(new ResearchConfiguration());
+            modelBuilder.ApplyConfiguration(new ResearchResultConfiguration());
         }   
     }
 }

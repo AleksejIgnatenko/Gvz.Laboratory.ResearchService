@@ -8,7 +8,8 @@ namespace Gvz.Laboratory.ResearchService.Validations
         public ResearchValidation()
         {
             RuleFor(x => x.ResearchName)
-                .NotEmpty().WithMessage("Название исследования не может быть пустым");
+                .NotEmpty().WithMessage("Название исследования не может быть пустым.")
+                .MaximumLength(128).WithMessage("Название исследования не должно превышать 128 символов.");
         }
     }
 }

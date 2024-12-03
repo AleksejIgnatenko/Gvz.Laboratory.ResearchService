@@ -94,7 +94,12 @@ namespace Gvz.Laboratory.ResearchService.Services
                 throw new ResearchValidationException(errors);
             }
 
-            var researchId = await _researchRepository.UpdateResearchAsync(research, productId);
+            var researchEntity = await _researchRepository.UpdateResearchAsync(research, productId);
+
+            if (researchEntity.Product.Id != productId)
+            {
+                var researchResultId = await _researchResultsService.AddResearchResultToParties(research.Id, productId);
+            }
 
             ResearchDto researchDto = new ResearchDto
             {
@@ -104,7 +109,7 @@ namespace Gvz.Laboratory.ResearchService.Services
 
             await _researchKafkaProducer.SendToKafkaAsync(researchDto, "update-research-topic");
 
-            return researchId;
+            return researchEntity.Id;
         }
 
         public async Task DeleteResearchAsync(List<Guid> ids)
