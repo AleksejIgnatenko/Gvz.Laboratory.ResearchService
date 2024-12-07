@@ -17,6 +17,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager,Worker")]
         public async Task<ActionResult> CreateResearchAsync([FromBody] CreateResearchRequest createResearchRequest)
         {
             var id = await _researchService.CreateResearchAsync(Guid.NewGuid(),
@@ -27,6 +28,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
 
         [HttpGet]
         [Route("getResearchesByProductIdForPage")]
+        [Authorize]
         public async Task<ActionResult> GetResearchesByProductIdForPageAsync(Guid productId, int pageNumber)
         {
             var (researches, numberResearches) = await _researchService.GetResearchesByProductIdForPageAsync(productId, pageNumber);
@@ -39,6 +41,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult> GetResearchesForPageAsync(int pageNumber)
         {
             var (researches, numberResearches) = await _researchService.GetResearchesForPageAsync(pageNumber);
@@ -76,6 +79,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [Authorize(Roles = "Admin,Manager,Worker")]
         public async Task<ActionResult> UpdateResearchAsync(Guid id, [FromBody] UpdateResearchRequest updateResearchRequest)
         {
             await _researchService.UpdateResearchAsync(id, updateResearchRequest.ResearchName, updateResearchRequest.ProductId);
@@ -83,6 +87,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin,Manager,Worker")]
         public async Task<ActionResult> DeleteResearchAsync([FromBody] List<Guid> ids)
         {
             if (ids == null || !ids.Any())

@@ -17,7 +17,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
 
         [HttpGet]
         [Route("creationOfAQualityAndSafetyCertificate")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> CreationOfAQualityAndSafetyCertificateAsync(Guid partyId)
         {
             var stream = await _partyService.CreationOfAQualityAndSafetyCertificateAsync(partyId);

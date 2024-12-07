@@ -1,6 +1,7 @@
 ﻿using Gvz.Laboratory.ResearchService.Abstractions;
 using Gvz.Laboratory.ResearchService.Contracts;
 using Gvz.Laboratory.ResearchService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gvz.Laboratory.ResearchService.Controllers
@@ -18,6 +19,7 @@ namespace Gvz.Laboratory.ResearchService.Controllers
 
         [HttpGet]
         [Route("getProductForResearchId")]
+        [Authorize]
         public async Task<ActionResult> GetProductForResearchIdAsync(Guid researchId)
         {
             var product = await _productService.GetProductForResearchIdAsync(researchId);
